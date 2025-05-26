@@ -5,13 +5,13 @@ import os
 assets_dir = os.path.join(os.path.dirname(__file__), 'assets')
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, x, y, paddle, group_all, group_self, group_blocks):
+    def __init__(self, x, y, size, speed, paddle, group_all, group_self, group_blocks):
         super().__init__(group_self, group_all)
         self.image = pygame.image.load(os.path.join(assets_dir, "ball.png")).convert_alpha()#Название пнгшки
-        self.image = pygame.transform.scale(self.image, (15, 15))#Редачу размер
+        self.image = pygame.transform.scale(self.image, (size, size))#Редачу размер
         self.rect = self.image.get_rect(center=(x, y))#ограничивающии прямоугольник
         self.vx = random.choice([-4, 4])
-        self.vy = -8
+        self.vy = -speed
         self.paddle = paddle
         self.group_blocks = group_blocks
     

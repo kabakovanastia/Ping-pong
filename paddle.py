@@ -4,12 +4,12 @@ import os
 assets_dir = os.path.join(os.path.dirname(__file__), 'assets')
 
 class Paddle(pygame.sprite.Sprite):
-    def __init__(self, screen_width, screen_height, group_all):
+    def __init__(self, screen_width, screen_height, paddle_width, paddle_height, paddle_speed, paddle_indent, group_all):
         super().__init__(group_all)#Наследование(Хз в лекции так)
         self.image = pygame.image.load(os.path.join(assets_dir, "platform.png")).convert_alpha()#Название пнгшки
-        self.image = pygame.transform.scale(self.image, (160, 15))#Редачу размер
-        self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - 30))#Ограничивающии прямоугольник
-        self.speed = 10
+        self.image = pygame.transform.scale(self.image, (paddle_width, paddle_height))#Редачу размер
+        self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - paddle_indent))#Ограничивающии прямоугольник
+        self.speed = paddle_speed
         self.screen_width = screen_width
 
     #Управление на стрелочки
