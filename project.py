@@ -19,6 +19,8 @@ ball_size = int(config['BALL']['size'])
 ball_speed = int(config['BALL']['speed'])
 ball_indent = int(config['BALL']['indent'])
 
+current_level = int(config['LEVEL']['current'])
+
 pygame.init()
 
 size = pygame.display.get_desktop_sizes()#что бы на всех компьютерах работало корректно
@@ -34,19 +36,24 @@ all_sprites = pygame.sprite.Group()
 balls = pygame.sprite.Group()
 blocks = pygame.sprite.Group()
 
-paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)#Ракетка
-Ball(width // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks)#Старторый мячик на ракетке
-
-load_level(1, block_size, width, height, all_sprites, blocks)#Уровни некоректно отображаются
 
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    
+
+    if len(blocks) == 0:
+        current_level = current_level % 5
+        current_level += 1
+        for sprite in all_sprites:
+            sprite.kill()
+        load_level(current_level, block_size, width, height, all_sprites, blocks)#Уровни правильно отображаются, но переключаться не будут тк есть неразруш блоки
+        paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)#Ракетка
+        Ball(width // 3, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks)#Старторый мячик на ракетке
+                                                                                                         #^^^^^^^^^ какой-какой?
     if len(balls) == 0:#Проигрыш
-        running = False#Пока что сразу выход(Добавить менюшку рестарта)
+        running = False#Пока что сразу выход(Добавить менюшку рестарта
 
     paddle.update()
     balls.update(width, height)
