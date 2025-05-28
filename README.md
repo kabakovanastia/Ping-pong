@@ -1,2 +1,0 @@
-# Ping-pong
-# Hello world
