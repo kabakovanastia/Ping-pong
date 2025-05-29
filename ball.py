@@ -2,11 +2,13 @@ import pygame
 import random
 import math
 import os
+from random import randint
+from boosts import Boost
 
 assets_dir = os.path.join(os.path.dirname(__file__), 'assets')
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, x, y, size, speed, paddle, group_all, group_self, group_blocks):
+    def __init__(self, x, y, size, speed, paddle, group_all, group_self, group_blocks, group_boosts):
         super().__init__(group_self, group_all)
         self.image = pygame.image.load(os.path.join(assets_dir, "ball.png")).convert_alpha()#Название пнгшки
         self.image = pygame.transform.scale(self.image, (size, size))#Редачу размер
@@ -14,7 +16,11 @@ class Ball(pygame.sprite.Sprite):
         self.vx = random.choice([-4, 4])
         self.vy = -speed
         self.paddle = paddle
+        self.group_self = group_self
         self.group_blocks = group_blocks
+        self.group_all = group_all
+        self.group_boosts = group_boosts
+
     
     def update(self, screen_width, screen_height):
         #Меняем позицию
@@ -24,8 +30,10 @@ class Ball(pygame.sprite.Sprite):
         #Столкновение со стенами
         if self.rect.left <= 0 or self.rect.right >= screen_width:
             self.vx = -self.vx
+            self.rect.x += self.vx
         if self.rect.top <= 0:
             self.vy = -self.vy
+            self.rect.y += self.vy
 
         #Улетел вниз(kill() - удаляет спрайт полность из всех групп)
         if self.rect.bottom >= screen_height:
@@ -59,3 +67,8 @@ class Ball(pygame.sprite.Sprite):
                 self.rect.centerx += self.vy
                 if block.block_type != 1:#1 не разрушаемые блоки
                     block.kill()
+                    if random.randint(1, 8) == 1:
+                        if random.randint(1, len(self.group_self)) == 1:
+                            Boost("*", block.rect.x, block.rect.y, self.group_all, self.group_boosts)
+                        else:
+                            Boost("+", block.rect.x, block.rect.y, self.group_all, self.group_boosts)
