@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 import os
 
 assets_dir = os.path.join(os.path.dirname(__file__), 'assets')
@@ -30,11 +31,24 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.bottom >= screen_height:
             self.kill()
 
-        if self.rect.colliderect(self.paddle.rect):#Проверка столновения self с ракеткой за этот тик
-            self.vy = -abs(self.vy)#Вектор скорости по y на положительный
-            offset = (self.rect.centerx - self.paddle.rect.centerx) / (self.paddle.rect.width // 2)#Что бы не было застревания
-            self.vx += offset * 2
-            self.vx = max(min(self.vx, 6), -6)#Угол отдаления
+        if self.rect.colliderect(self.paddle.rect) and self.vy > 0:
+                # Центр мяча и ракетки
+                ball_center = self.rect.centerx
+                paddle_center = self.paddle.rect.centerx
+                distance = ball_center - paddle_center
+
+                # Относительная позиция от центра (-1 до 1)
+                offset = distance / (self.paddle.rect.width / 2)
+
+                # Максимальный угол отражения
+                max_angle = math.radians(60)
+
+                # Угол отскока
+                angle = offset * max_angle
+
+                speed = math.hypot(self.vx, self.vy)  # сохранить общую скорость
+                self.vx = speed * math.sin(angle)
+                self.vy = -self.vy
         
         for block in self.group_blocks:
             if self.rect.colliderect(block.rect):
@@ -42,5 +56,6 @@ class Ball(pygame.sprite.Sprite):
                 offset = (self.rect.centerx - block.rect.centerx) / (block.rect.width // 2)#Что бы не было застревания
                 self.vx += offset * 2
                 self.vx = max(min(self.vx, 6), -6)#Угол отдаления
+                self.rect.centerx += self.vy
                 if block.block_type != 1:#1 не разрушаемые блоки
                     block.kill()
