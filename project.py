@@ -4,6 +4,7 @@ from paddle import Paddle
 from ball import Ball
 from block import Block
 from level_loader import load_level
+from music import Music
 import configparser
 
 config = configparser.ConfigParser()
@@ -35,13 +36,36 @@ clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 balls = pygame.sprite.Group()
 blocks = pygame.sprite.Group()
+boosts = pygame.sprite.Group()
 
+muzlo = Music(0.02)
+muzlo.play()
+sound_get_bonus = pygame.mixer.Sound("assets/special_sound/get_bonus.mp3")
+sound_get_bonus.set_volume(0.5)
 
 running = True
 while running:
+    muzlo.check_song()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    if len(boosts) != 0:
+        for sprite in boosts:
+            if sprite.rect.colliderect(paddle.rect):
+                if sprite.boost_type == "+":
+                    Ball(paddle.rect.x - ball_indent // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+                    Ball(paddle.rect.x, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+                    Ball(paddle.rect.x + ball_indent // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+                    sound_get_bonus.play()
+
+                else:
+                    for ball in balls:
+                        for i in range(2):
+                            Ball(ball.rect.x, ball.rect.y, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+                            sound_get_bonus.play()
+                sprite.kill()
 
     if len(blocks) == 0:
         current_level = current_level % 5
@@ -50,14 +74,15 @@ while running:
             sprite.kill()
         load_level(current_level, block_size, width, height, all_sprites, blocks)#Уровни правильно отображаются, но переключаться не будут тк есть неразруш блоки
         paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)#Ракетка
-        Ball(width // 3, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks)#Старторый мячик на ракетке
-                                                                                                         #^^^^^^^^^ какой-какой?
+        Ball(width // 3, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)#Старторый мячик на ракетке
+        
     if len(balls) == 0:#Проигрыш
         running = False#Пока что сразу выход(Добавить менюшку рестарта
 
     paddle.update()
     balls.update(width, height)
-    
+    boosts.update()
+
     screen.fill((30, 30, 45))
     all_sprites.draw(screen)
     pygame.display.flip()
