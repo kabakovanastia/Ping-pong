@@ -2,7 +2,8 @@ import pygame
 import os
 from paddle import Paddle
 from ball import Ball
-from block import Block
+from heart import Heart
+from heart import create_hearts
 from level_loader import load_level
 from music import Music
 import configparser
@@ -22,6 +23,8 @@ ball_indent = int(config['BALL']['indent'])
 
 current_level = int(config['LEVEL']['current'])
 
+heart_count = int(config["HEART"]["count"])
+
 pygame.init()
 
 size = pygame.display.get_desktop_sizes()#что бы на всех компьютерах работало корректно
@@ -37,11 +40,18 @@ all_sprites = pygame.sprite.Group()
 balls = pygame.sprite.Group()
 blocks = pygame.sprite.Group()
 boosts = pygame.sprite.Group()
+hearts = pygame.sprite.Group()
 
 muzlo = Music(0.02)
 muzlo.play()
 sound_get_bonus = pygame.mixer.Sound("assets/special_sound/get_bonus.mp3")
 sound_get_bonus.set_volume(0.5)
+
+
+load_level(current_level, block_size, width, height, all_sprites, blocks)
+paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)
+Ball(width // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+create_hearts(heart_count, all_sprites, hearts)
 
 running = True
 while running:
@@ -59,7 +69,6 @@ while running:
                     Ball(paddle.rect.x, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
                     Ball(paddle.rect.x + ball_indent // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
                     sound_get_bonus.play()
-
                 else:
                     for ball in balls:
                         for i in range(2):
@@ -71,14 +80,25 @@ while running:
         current_level = current_level % 5
         current_level += 1
         for sprite in all_sprites:
-            sprite.kill()
+            if not isinstance(sprite, Heart):
+                sprite.kill()
         load_level(current_level, block_size, width, height, all_sprites, blocks)#Уровни правильно отображаются, но переключаться не будут тк есть неразруш блоки
+        create_hearts(heart_count, all_sprites, hearts)
         paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)#Ракетка
-        Ball(width // 3, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)#Старторый мячик на ракетке
+        Ball(width // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)#Старторый мячик на ракетке
         
     if len(balls) == 0:#Проигрыш
-        running = False#Пока что сразу выход(Добавить менюшку рестарта
-
+        heart_count -= 1
+        if heart_count == 0:
+            running = False#Пока что сразу выход(Добавить менюшку рестарта
+        else:
+            for heart in hearts:
+                heart.kill()
+            paddle.kill()
+            create_hearts(heart_count, all_sprites, hearts)
+            Ball(width // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+            paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)
+    
     paddle.update()
     balls.update(width, height)
     boosts.update()
