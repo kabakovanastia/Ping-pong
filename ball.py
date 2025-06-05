@@ -69,7 +69,8 @@ class Ball(pygame.sprite.Sprite):
                 offset = (self.rect.centerx - block.rect.centerx) / (block.rect.width // 2)#Что бы не было застревания
                 self.vx += offset * 2
                 self.vx = max(min(self.vx, 6), -6)#Угол отдаления
-                self.rect.centerx += self.vy
+                self.rect.centerx += self.vx
+                self.rect.centery += self.vy
                 if block.block_type != 1:#1 не разрушаемые блоки
                     block.kill()
                     sound_break.play()
