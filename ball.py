@@ -18,7 +18,7 @@ class Ball(pygame.sprite.Sprite):
         self.image = pygame.image.load(os.path.join(assets_dir, "ball.png")).convert_alpha()#Название пнгшки
         self.image = pygame.transform.scale(self.image, (size, size))#Редачу размер
         self.rect = self.image.get_rect(center=(x, y))#ограничивающии прямоугольник
-        self.vx = random.choice([-4, 4])
+        self.vx = 0
         self.vy = -speed
         self.paddle = paddle
         self.group_self = group_self
