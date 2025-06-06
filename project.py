@@ -48,6 +48,7 @@ sound_get_bonus = pygame.mixer.Sound("assets/special_sound/get_bonus.mp3")
 sound_get_bonus.set_volume(0.5)
 
 unbreak = load_level(current_level, block_size, width, height, all_sprites, blocks)
+
 paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)
 Ball(width // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
 create_hearts(heart_count, all_sprites, hearts)
