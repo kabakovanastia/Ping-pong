@@ -47,8 +47,8 @@ muzlo.play()
 sound_get_bonus = pygame.mixer.Sound("assets/special_sound/get_bonus.mp3")
 sound_get_bonus.set_volume(0.5)
 
+unbreak = load_level(current_level, block_size, width, height, all_sprites, blocks)
 
-load_level(current_level, block_size, width, height, all_sprites, blocks)
 paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)
 Ball(width // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
 create_hearts(heart_count, all_sprites, hearts)
@@ -76,15 +76,15 @@ while running:
                             sound_get_bonus.play()
                 sprite.kill()
 
-    if len(blocks) == 0:
+    if (len(blocks) - unbreak) == 0:
         current_level = current_level % 5
         current_level += 1
         for sprite in all_sprites:
             if not isinstance(sprite, Heart):
                 sprite.kill()
-        load_level(current_level, block_size, width, height, all_sprites, blocks)#Уровни правильно отображаются, но переключаться не будут тк есть неразруш блоки
+        load_level(current_level, block_size, width, height, all_sprites, blocks)#Уровни правильно отображаются, и переключаются
         create_hearts(heart_count, all_sprites, hearts)
-        paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)#Ракетка
+        paddle = Paddle(width, height, paddle_width, paddle_height, paddle_speed, paddle_indent, all_sprites)#Ракетка тамаева
         Ball(width // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)#Старторый мячик на ракетке
         
     if len(balls) == 0:#Проигрыш
@@ -109,3 +109,4 @@ while running:
     clock.tick(60)
 
 pygame.quit()
+
