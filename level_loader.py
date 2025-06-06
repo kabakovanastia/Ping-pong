@@ -16,21 +16,17 @@ def load_level(level_number, block_size, width, height, group_all, group_self):
             break
 
     layout = level_data["layout"]
-    unbreak = 0
 
     for y in range(len(layout)):
             for x in range(len(layout[y])):
                 block_type = layout[y][x]
                 if block_type == 0:
                     continue  # пропустить пустые блоки
-                if block_type == 1:
-                     unbreak += 1
                 size = width // block_size
                 pos_x = x * (size + size // 6)
                 pos_y = y * (size + size // 6)
                 Block(pos_x, pos_y, size, block_type, group_all, group_self)
 
-    return unbreak
 
 def count_unbreak(level_number):
     levels_path = os.path.join(os.path.dirname(__file__), 'levels.json')

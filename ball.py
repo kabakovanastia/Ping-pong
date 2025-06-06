@@ -75,7 +75,7 @@ class Ball(pygame.sprite.Sprite):
                 if block.block_type != 1:#1 не разрушаемые блоки
                     block.kill()
                     sound_break.play()
-                    if random.randint(1, 2) == 1:
+                    if random.randint(1, 8) == 1:
                         if random.randint(1, len(self.group_self)) == 1:
                             Boost("*", block.rect.x, block.rect.y, self.group_all, self.group_boosts)
                             sound_drop_bonus.play()
