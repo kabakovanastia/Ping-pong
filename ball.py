@@ -39,6 +39,7 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.top <= 0:
             self.vy = -self.vy
             self.rect.y += self.vy
+            self.rect.top += 15
 
         #Улетел вниз(kill() - удаляет спрайт полность из всех групп)
         if self.rect.bottom >= screen_height:
@@ -74,7 +75,7 @@ class Ball(pygame.sprite.Sprite):
                 if block.block_type != 1:#1 не разрушаемые блоки
                     block.kill()
                     sound_break.play()
-                    if random.randint(1, 8) == 1:
+                    if random.randint(1, 2) == 1:
                         if random.randint(1, len(self.group_self)) == 1:
                             Boost("*", block.rect.x, block.rect.y, self.group_all, self.group_boosts)
                             sound_drop_bonus.play()

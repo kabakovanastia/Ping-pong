@@ -6,7 +6,7 @@ from heart import Heart
 from button import Button
 from block import Block
 from heart import create_hearts
-from level_loader import load_level
+from level_loader import load_level, count_unbreak
 from music import Music
 import configparser
 
@@ -27,7 +27,7 @@ current_level = int(config['LEVEL']['current'])
 
 heart_count = int(config["HEART"]["count"])
 
-button_indent = int(config["BUTTON"]["indent"])
+button_height = int(config['BUTTON']['height'])
 
 pygame.init()
 
@@ -53,7 +53,7 @@ sound_get_bonus = pygame.mixer.Sound("assets/special_sound/get_bonus.mp3")
 sound_get_bonus.set_volume(0.5)
 
 but_play = Button(width // 2, height // 2, 'play', width, height, buttons)
-but_exit = Button(width // 2, height // 2 + button_indent, 'exit', width, height, buttons)
+but_exit = Button(width // 2, height // 2 + (height // button_height) * 1.5, 'exit', width, height, buttons)
 
 def start_game(load=True):
     if load:
@@ -68,6 +68,7 @@ is_paused = True
 running = True
 while running:
     muzlo.check_song()
+    unbreak = count_unbreak(current_level)
 
     for event in pygame.event.get():
         keys = pygame.key.get_pressed()
@@ -84,9 +85,9 @@ while running:
             for sprite in boosts:
                 if sprite.rect.colliderect(paddle.rect):
                     if sprite.boost_type == "+":
-                        Ball(paddle.rect.x - ball_indent // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
-                        Ball(paddle.rect.x, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
-                        Ball(paddle.rect.x + ball_indent // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+                        Ball(paddle_width // 2 + paddle.rect.x - ball_indent // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+                        Ball(paddle_width // 2 + paddle.rect.x, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
+                        Ball(paddle_width // 2 + paddle.rect.x + ball_indent // 2, height - ball_indent, ball_size, ball_speed, paddle, all_sprites, balls, blocks, boosts)
                         sound_get_bonus.play()
                     else:
                         for ball in balls:
@@ -95,7 +96,7 @@ while running:
                                 sound_get_bonus.play()
                     sprite.kill()
 
-        if len(blocks) == 0:
+        if (len(blocks) - unbreak) == 0:
 
             current_level += 1
             if current_level == 6:
