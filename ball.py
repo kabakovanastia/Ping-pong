@@ -39,6 +39,7 @@ class Ball(pygame.sprite.Sprite):
         if self.rect.top <= 0:
             self.vy = -self.vy
             self.rect.y += self.vy
+            self.rect.top += 15
 
         #Улетел вниз(kill() - удаляет спрайт полность из всех групп)
         if self.rect.bottom >= screen_height:
