@@ -46,39 +46,41 @@ class Ball(pygame.sprite.Sprite):
             self.kill()
 
         if self.rect.colliderect(self.paddle.rect) and self.vy > 0:
-                # Центр мяча и ракетки
                 ball_center = self.rect.centerx
                 paddle_center = self.paddle.rect.centerx
                 distance = ball_center - paddle_center
-
-                # Относительная позиция от центра (-1 до 1)
+                if abs(self.rect.centery - self.paddle.rect.centery) < (self.paddle.paddle_height // 2):
+                    self.rect.bottom = self.paddle.rect.top
                 offset = distance / (self.paddle.rect.width / 2)
-
-                # Максимальный угол отражения
                 max_angle = math.radians(60)
-
-                # Угол отскока
                 angle = offset * max_angle
-
-                speed = math.hypot(self.vx, self.vy)  # сохранить общую скорость
+                speed = math.hypot(self.vx, self.vy)
                 self.vx = speed * math.sin(angle)
                 self.vy = -self.vy
         
+        # Столкновение с блоками
         for block in self.group_blocks:
             if self.rect.colliderect(block.rect):
-                self.vy = -self.vy#Вектор скорости по y на положительный
-                offset = (self.rect.centerx - block.rect.centerx) / (block.rect.width // 2)#Что бы не было застревания
-                self.vx += offset * 2
-                self.vx = max(min(self.vx, 6), -6)#Угол отдаления
-                self.rect.centerx += self.vx
-                self.rect.centery += self.vy
-                if block.block_type != 1:#1 не разрушаемые блоки
+                dx = (self.rect.centerx - block.rect.centerx) / (block.rect.width / 2)
+                dy = (self.rect.centery - block.rect.centery) / (block.rect.height / 2)
+
+                if abs(dx) > abs(dy):
+                    self.vx = -self.vx
+                    if dx > 0:
+                        self.rect.left = block.rect.right
+                    else:
+                        self.rect.right = block.rect.left
+                else:
+                    self.vy = -self.vy
+                    if dy > 0:
+                        self.rect.top = block.rect.bottom
+                    else:
+                        self.rect.bottom = block.rect.top
+
+                if block.block_type != 1:
                     block.kill()
                     sound_break.play()
                     if random.randint(1, 8) == 1:
-                        if random.randint(1, len(self.group_self)) == 1:
-                            Boost("*", block.rect.x, block.rect.y, self.group_all, self.group_boosts)
-                            sound_drop_bonus.play()
-                        else:
-                            Boost("+", block.rect.x, block.rect.y, self.group_all, self.group_boosts)
-                            sound_drop_bonus.play()
+                        boost_type = "*" if random.randint(1, len(self.group_self)) == 1 else "+"
+                        Boost(boost_type, block.rect.x, block.rect.y, self.group_all, self.group_boosts)
+                        sound_drop_bonus.play()
