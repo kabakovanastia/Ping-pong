@@ -11,6 +11,7 @@ class Paddle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=(screen_width // 2, screen_height - paddle_indent))#Ограничивающии прямоугольник
         self.speed = paddle_speed
         self.screen_width = screen_width
+        self.paddle_height = paddle_height
 
     #Управление на стрелочки
     def update(self):
